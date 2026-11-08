@@ -1,0 +1,71 @@
+name: Build and publish V4 Windows portable
+on:
+  workflow_dispatch:
+  push:
+    paths: ['V4/**', '.github/workflows/build-v4.yml']
+  pull_request:
+    paths: ['V4/**', '.github/workflows/build-v4.yml']
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-qt6-base
+            mingw-w64-ucrt-x86_64-qt6-svg
+            mingw-w64-ucrt-x86_64-binutils
+      - name: Build, test and package
+        shell: msys2 {0}
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File V4/scripts/build-ucrt64.ps1 -UcrtRoot "$(cygpath -w /ucrt64)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ContextMenuSwapper-V4-win64
+          path: V4/dist/*.zip
+          if-no-files-found: error
+  release:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: windows
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: ContextMenuSwapper-V4-win64
+          path: release-assets
+      - name: Publish V4.0
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          gh release view V4.0 --json tagName 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host 'Release V4.0 already exists; keeping the published files.'
+            exit 0
+          }
+          $archives = @(Get-ChildItem -LiteralPath release-assets -Filter '*.zip' -File)
+          if ($archives.Count -ne 1) { throw 'Expected exactly one tested portable ZIP' }
+          $portable = Join-Path $PWD 'release-assets/ContextMenuSwapper-v4.0-win64-portable.zip'
+          Move-Item -LiteralPath $archives[0].FullName -Destination $portable
+          $checksum = (Get-FileHash -LiteralPath $portable -Algorithm SHA256).Hash.ToLowerInvariant()
+          $sumFile = Join-Path $PWD 'release-assets/SHA256SUMS.txt'
+          "$checksum  ContextMenuSwapper-v4.0-win64-portable.zip" | Set-Content -LiteralPath $sumFile -Encoding utf8NoBOM
+          gh release create V4.0 $portable $sumFile --target $env:SOURCE_COMMIT --title 'V4.0 — Leth Edition' --notes-file V4/RELEASE_NOTES.md --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }

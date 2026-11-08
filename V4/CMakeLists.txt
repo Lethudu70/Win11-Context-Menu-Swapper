@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.24)
+project(ContextMenuSwapper VERSION 4.0.0 LANGUAGES CXX RC)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Widgets)
+qt_add_executable(ContextMenuSwapper WIN32
+    src/main.cpp src/registry.cpp src/registry.h src/window.cpp src/window.h
+    src/selftest.cpp resources/app.qrc resources/app.rc)
+target_sources(ContextMenuSwapper PRIVATE src/machine.cpp src/machine.h)
+target_sources(ContextMenuSwapper PRIVATE src/cache.cpp src/cache.h)
+target_compile_definitions(ContextMenuSwapper PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN NOMINMAX)
+target_link_libraries(ContextMenuSwapper PRIVATE Qt6::Widgets advapi32 user32 shell32 ole32)
+target_include_directories(ContextMenuSwapper PRIVATE resources)
+if(MINGW)
+    target_compile_options(ContextMenuSwapper PRIVATE -Wall -Wextra -Wpedantic)
+    # Avoid cmd.exe AutoRun output contaminating windres' preprocessor pipe.
+    set_source_files_properties(resources/app.rc PROPERTIES COMPILE_OPTIONS "--use-temp-file")
+endif()
+enable_testing()
+add_test(NAME registry_roundtrip COMMAND ContextMenuSwapper --self-test)
+set_tests_properties(registry_roundtrip PROPERTIES TIMEOUT 30 ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
