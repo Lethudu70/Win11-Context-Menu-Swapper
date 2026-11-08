@@ -1,0 +1,25 @@
+name: Update V4.0 release description (FR / EN)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/RELEASE_NOTES-v4.0.md'
+      - '.github/workflows/update-release-description.yml'
+permissions:
+  contents: write
+jobs:
+  update-description:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - name: Update existing release notes only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release view V4.0 --json id --jq '.id'
+          gh release edit V4.0 --notes-file docs/RELEASE_NOTES-v4.0.md
+          gh release view V4.0 --json url --jq '.url'
