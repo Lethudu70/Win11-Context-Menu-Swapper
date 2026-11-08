@@ -19,9 +19,13 @@ Une nouvelle version en **C++ et Qt 6** pour retrouver le menu contextuel classi
 
 ### Installation
 
+**Installateur : [ContextMenuSwapper-v4.0-Setup.exe](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.0/ContextMenuSwapper-v4.0-Setup.exe)** — assistant Inno Setup personnalisé noir/vert, avec les icônes de l'application. **Français par défaut, anglais disponible au démarrage.** Installation pour votre compte, raccourci du menu Démarrer, raccourci Bureau optionnel et désinstallation via Applications installées. Le setup installe les fichiers sans appliquer de changement au menu Windows ; la désinstallation conserve préférences, sauvegardes et configuration du menu.
+
+**Version portable :**
+
 Téléchargez **ContextMenuSwapper-v4.0-win64-portable.zip**, extrayez **tout son contenu**, puis lancez `ContextMenuSwapper.exe`. Conservez les DLL et sous-dossiers Qt, notamment `platforms`. Aucun Python, Qt ou MSYS2 n'est à installer pour utiliser le portable.
 
-`SHA256SUMS.txt` permet de vérifier l'intégrité du ZIP. Les sources et scripts CMake/Ninja/UCRT64 sont disponibles au tag `V4.0`.
+`ContextMenuSwapper-v4.0-Setup.sha256` fournit l’empreinte de l’installateur. `SHA256SUMS.txt` permet de vérifier l'intégrité du ZIP. Les sources et scripts CMake/Ninja/UCRT64 sont disponibles au tag `V4.0`.
 
 ### Mode expérimental et compatibilité
 
@@ -48,9 +52,13 @@ A new **C++ and Qt 6** release for restoring the classic context menu or returni
 
 ### Installation
 
+**Installer: [ContextMenuSwapper-v4.0-Setup.exe](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.0/ContextMenuSwapper-v4.0-Setup.exe)** — a branded dark green/black Inno Setup wizard with application icons. **French is the default; English is available at startup.** Per-user installation, Start menu shortcut, optional desktop shortcut and standard Installed Apps uninstallation. Setup installs files without changing the Windows context menu; uninstall preserves preferences, backups and menu configuration.
+
+**Portable version:**
+
 Download **ContextMenuSwapper-v4.0-win64-portable.zip**, extract **all its contents**, then run `ContextMenuSwapper.exe`. Keep the DLLs and Qt subfolders, especially `platforms`. Python, Qt and MSYS2 do not need to be installed to use the portable package.
 
-Use `SHA256SUMS.txt` to verify the ZIP's integrity. Source code and CMake/Ninja/UCRT64 scripts are available at the `V4.0` tag.
+Use `ContextMenuSwapper-v4.0-Setup.sha256` to verify the installer. Use `SHA256SUMS.txt` to verify the ZIP's integrity. Source code and CMake/Ninja/UCRT64 scripts are available at the `V4.0` tag.
 
 ### Experimental mode and compatibility
 
@@ -59,3 +67,5 @@ Use `SHA256SUMS.txt` to verify the ZIP's integrity. Source code and CMake/Ninja/
 Menu behavior depends on the Windows build and system policies. Registry verification does not guarantee the visual result. Automated tests use isolated keys; the real context menu and UAC flow still need to be tested on the Windows builds you use. The executables are unsigned.
 
 Documentation: [V4/README.md (French)](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/blob/V4.0/V4/README.md).
+
+Installer source / Source de l’installateur : [V4/installer](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/tree/main/V4/installer).

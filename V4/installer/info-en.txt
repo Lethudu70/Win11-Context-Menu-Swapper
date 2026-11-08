@@ -1,0 +1,17 @@
+﻿CONTEXT MENU SWAPPER v4.0 — LETH EDITION
+
+Your Windows menu, on your terms.
+
+• Rounded Qt 6 interface in French and English.
+• Automatic Windows version detection.
+• Verified configuration, backup and undo.
+• Explorer restarts only when you request it.
+
+PERSONAL INSTALLATION
+The app and its DLLs are installed for your account. Installation does not change your context-menu configuration.
+
+EXPERIMENTAL MODE
+HKCU is the default mode. HKLM can affect all accounts: it remains experimental, is not recommended for standard users, and requires UAC authorization and confirmations inside the app. Test it in Windows Sandbox or a virtual machine.
+
+YOUR DATA STAYS WITH YOU
+Uninstall removes the program and its shortcuts. It preserves preferences, backups and your Windows menu configuration.

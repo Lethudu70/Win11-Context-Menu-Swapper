@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="492" height="942" viewBox="0 0 492 942">
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#07130e"/><stop offset="1" stop-color="#163c2b"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#66eea2" stop-opacity=".13"/><stop offset="1" stop-color="#66eea2" stop-opacity="0"/></radialGradient>
+ <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#70e6a6" stroke-opacity=".045"/></pattern>
+</defs>
+<rect width="492" height="942" fill="url(#bg)"/><rect width="492" height="942" fill="url(#grid)"/>
+<ellipse cx="246" cy="365" rx="330" ry="345" fill="url(#glow)"/>
+<path d="M46 64H100" stroke="#66eea2" stroke-width="6" stroke-linecap="round"/>
+<text x="46" y="104" fill="#a5c8b4" font-family="Segoe UI, sans-serif" font-size="23" letter-spacing="5">LETH TOOLS</text>
+<g transform="translate(104 198) scale(1.11)">
+ <rect x="8" y="8" width="240" height="240" rx="56" fill="#0b1110"/>
+ <rect x="14" y="14" width="228" height="228" rx="50" fill="none" stroke="#66eea2" stroke-width="6"/>
+ <rect x="53" y="54" width="150" height="135" rx="20" fill="#182c21" stroke="#66eea2" stroke-width="7"/>
+ <path d="M82 87h63M82 118h91M82 149h53" stroke="#e6f0eb" stroke-width="10" stroke-linecap="round"/>
+ <path d="M130 181h76l-20-20m20 20-20 20M126 210H50l20-20m-20 20 20 20" fill="none" stroke="#66eea2" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="44" y="585" fill="#f1fff6" font-family="Segoe UI, sans-serif" font-size="39" font-weight="700">CONTEXT MENU</text>
+<text x="44" y="639" fill="#f1fff6" font-family="Segoe UI, sans-serif" font-size="52" font-weight="700">SWAPPER</text>
+<rect x="46" y="684" width="172" height="55" rx="15" fill="#10281c" stroke="#4b9568"/>
+<text x="132" y="722" text-anchor="middle" fill="#83f3b3" font-family="Segoe UI, sans-serif" font-size="29" font-weight="600">v4.0</text>
+<path d="M46 811H446" stroke="#4d8b65" stroke-opacity=".5"/>
+<text x="46" y="855" fill="#b5d3c1" font-family="Segoe UI, sans-serif" font-size="21" letter-spacing="2">WINDOWS · x64</text>
+<text x="46" y="894" fill="#6d9e83" font-family="Segoe UI, sans-serif" font-size="18" letter-spacing="3">LETH EDITION</text>
+</svg>

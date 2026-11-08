@@ -23,6 +23,10 @@ Retrouvez le menu contextuel classique ou rétablissez le comportement Windows p
 
 ### Installer et utiliser
 
+**Avec installation :** téléchargez **[ContextMenuSwapper-v4.0-Setup.exe](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.0/ContextMenuSwapper-v4.0-Setup.exe)** et suivez l'assistant Inno Setup noir/vert. Le **français est sélectionné par défaut** ; l'anglais est disponible au démarrage. L'installation est personnelle, avec icône dans Applications installées, raccourci du menu Démarrer et raccourci Bureau optionnel. Elle ne change pas votre menu Windows. [Voir le setup](docs/images/setup-v4.0-fr.png).
+
+**Sans installation :** utilisez le ZIP portable :
+
 1. Téléchargez `ContextMenuSwapper-v4.0-win64-portable.zip` depuis la release V4.0.
 2. Extrayez **tout le ZIP** dans un dossier de votre choix.
 3. Lancez `ContextMenuSwapper.exe`. Conservez les DLL et les sous-dossiers, notamment `platforms`.
@@ -74,6 +78,10 @@ Context Menu Swapper v4.0 lets you restore the classic context menu or return to
 - **Separate experimental HKLM mode**, with UAC authorization and explicit confirmation.
 
 ### Installation and use
+
+**Installer option:** download **[ContextMenuSwapper-v4.0-Setup.exe](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.0/ContextMenuSwapper-v4.0-Setup.exe)** and follow the dark green/black Inno Setup wizard. **French is selected by default**; English is available at startup. It installs for your account, with an Installed Apps icon, a Start menu shortcut and an optional desktop shortcut. Installation does not change your Windows context menu. [Preview setup](docs/images/setup-v4.0-en.png).
+
+**Portable option:** use the ZIP package:
 
 1. Download `ContextMenuSwapper-v4.0-win64-portable.zip` from the V4.0 release.
 2. Extract **the entire ZIP** into a folder of your choice.

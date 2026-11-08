@@ -1,0 +1,17 @@
+﻿CONTEXT MENU SWAPPER v4.0 — LETH EDITION
+
+Un menu Windows à votre rythme.
+
+• Interface Qt 6 arrondie, en français et en anglais.
+• Détection de votre version de Windows.
+• Configuration vérifiée, sauvegarde et annulation.
+• Redémarrage d'Explorer uniquement à votre demande.
+
+INSTALLATION PERSONNELLE
+Le programme et ses DLL sont installés pour votre compte. L'installation n'applique aucun changement au menu contextuel.
+
+MODE EXPÉRIMENTAL
+HKCU est le mode habituel. Le mode HKLM peut affecter tous les comptes : il reste expérimental, non recommandé aux utilisateurs standard et soumis à l'UAC ainsi qu'à des confirmations dans l'application. Testez-le en Sandbox ou en machine virtuelle.
+
+VOS DONNÉES RESTENT À VOUS
+La désinstallation retire le programme et ses raccourcis. Elle conserve les préférences, les sauvegardes et la configuration du menu Windows.
