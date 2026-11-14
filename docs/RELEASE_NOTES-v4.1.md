@@ -1,4 +1,4 @@
-# Win11 Context Menu Swapper V4.1 — Windows 11 26H2
+# Context Menu Swapper V4.1 — New context menu key discovered
 
 ## Français
 
@@ -22,6 +22,8 @@
 
 Windows 11 a été installé via Rufus avec contournement des exigences matérielles. La configuration est hors des exigences officielles de Windows 11. Le test manuel sur ce PC confirme le retour au menu classique avec la manipulation HKCU sur 26300.9818. Le résultat visuel sous 26300.9974 et celui du mode HKLM restent à confirmer sur cette machine.
 
+Mauro Huculak rapporte un test réussi des deux clés HKCU sur **26300.9974** après KB5132061 et redémarrage d’Explorer. [Guide Pureinfotech](https://pureinfotech.com/bring-back-classic-context-menu-windows-11/)
+
 ## English
 
 - Classic mode now configures both HKCU CLSIDs, including `{51668040-5e31-4023-bbe3-149163bd80f1}`. This community workaround targets Windows 11 26H2 from build **26300.9818**, including **26300.9974**. The author confirmed the HKCU workaround on an HP running 26300.9818.
@@ -43,6 +45,8 @@ Windows 11 a été installé via Rufus avec contournement des exigences matérie
 | Update | Build **26300.9974** was still installing when the test was reported |
 
 Windows 11 was installed with Rufus using its hardware requirement bypass. This configuration falls outside the official Windows 11 requirements. The manual test on this PC confirmed classic menu behavior with the HKCU workaround on 26300.9818. Visual behavior on 26300.9974 and in HKLM mode is pending confirmation on this PC.
+
+Mauro Huculak reports a successful test of both HKCU keys on **26300.9974** after KB5132061 and restarting Explorer. [Pureinfotech guide](https://pureinfotech.com/bring-back-classic-context-menu-windows-11/)
 
 The automated tests verify registry writes and restoration using isolated keys. The actual Explorer menu can vary by Windows build and rollout.
 

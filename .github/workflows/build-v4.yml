@@ -74,7 +74,8 @@ jobs:
         run: |
           gh release view V4.1 --json tagName 2>$null
           if ($LASTEXITCODE -eq 0) {
-            Write-Host 'Release V4.1 already exists; keeping the published files.'
+            gh release edit V4.1 --title 'Context Menu Swapper V4.1 — New context menu key discovered' --notes-file docs/RELEASE_NOTES-v4.1.md
+            if ($LASTEXITCODE -ne 0) { throw 'Release notes update failed' }
             exit 0
           }
           $portable = Join-Path $PWD 'release-assets/ContextMenuSwapper-v4.1-win64-portable.zip'
@@ -83,5 +84,5 @@ jobs:
           $sumFile = Join-Path $PWD 'release-assets/SHA256SUMS.txt'
           $setupChecksum = (Get-Content -LiteralPath "$PWD/release-assets/ContextMenuSwapper-v4.1-Setup.sha256").Trim()
           @("$checksum  ContextMenuSwapper-v4.1-win64-portable.zip", $setupChecksum) | Set-Content -LiteralPath $sumFile -Encoding utf8NoBOM
-          gh release create V4.1 $portable $setup $sumFile --target $env:SOURCE_COMMIT --title 'V4.1 — Windows 11 26H2 patch' --notes-file docs/RELEASE_NOTES-v4.1.md --latest
+          gh release create V4.1 $portable $setup $sumFile --target $env:SOURCE_COMMIT --title 'Context Menu Swapper V4.1 — New context menu key discovered' --notes-file docs/RELEASE_NOTES-v4.1.md --latest
           if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }

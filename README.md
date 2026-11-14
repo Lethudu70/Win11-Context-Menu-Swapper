@@ -1,4 +1,4 @@
-# Win11 Context Menu Swapper — v4.1
+# Context Menu Swapper V4.1 — New context menu key discovered
 
 [Français](#français) · [English](#english) · [Release notes FR/EN](docs/RELEASE_NOTES-v4.1.md)
 
@@ -13,6 +13,8 @@ Retrouvez le menu contextuel classique ou rétablissez le comportement Windows p
 **Correctif Windows 11 26H2 à partir du build 26300.9818.** La V4.1 ajoute le CLSID `{51668040-5e31-4023-bbe3-149163bd80f1}` à l’ancien override. Le mode classique configure les deux clés pour votre compte (HKCU). Le mode HKLM expérimental applique la même méthode avec UAC. Les deux clés sont sauvegardées ensemble. [Détails et sources](V4/README.md#mode-standard--hkcu)
 
 La manipulation HKCU a été testée sur un **HP ProDesk 600 G1 SFF** sous Windows 11 Pro 26H2 **26300.9818**. [Configuration complète du PC de test](docs/RELEASE_NOTES-v4.1.md#configuration-de-test)
+
+Le correctif reprend la méthode à deux clés publiée par Mauro Huculak. Il rapporte l’avoir testée sur le build **26300.9974** après la mise à jour KB5132061 et le redémarrage d’Explorer. [Guide Pureinfotech du 13 novembre 2026](https://pureinfotech.com/bring-back-classic-context-menu-windows-11/#restore_classic_right-click_menu_on_windows_11_november_2026_fix)
 
 ### Les nouveautés
 
@@ -71,6 +73,8 @@ Context Menu Swapper v4.1 lets you restore the classic context menu or return to
 **Windows 11 26H2 patch for build 26300.9818 onward.** V4.1 adds CLSID `{51668040-5e31-4023-bbe3-149163bd80f1}` alongside the original override. Classic mode configures both keys for your account (HKCU). Experimental HKLM mode uses the same method with UAC. Both keys are backed up together. [Details and sources](V4/README.md#mode-standard--hkcu)
 
 The HKCU workaround was tested on an **HP ProDesk 600 G1 SFF** running Windows 11 Pro 26H2 **26300.9818**. [Full test system specifications](docs/RELEASE_NOTES-v4.1.md#test-system)
+
+This patch follows the two-key workaround published by Mauro Huculak. He reports testing it on build **26300.9974** after KB5132061 and restarting Explorer. [Pureinfotech guide, November 13, 2026](https://pureinfotech.com/bring-back-classic-context-menu-windows-11/)
 
 **[Download the V4.1 portable release](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/tag/V4.1)** · [Technical documentation and build instructions (French)](V4/README.md) · [Previous releases](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases)
 
