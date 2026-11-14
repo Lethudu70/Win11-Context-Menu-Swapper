@@ -2,13 +2,15 @@
 
 [Français](#français) · [English](#english) · [Release notes FR/EN](docs/RELEASE_NOTES-v4.1.md)
 
+## Démonstration vidéo / Video showcase
+
+https://github.com/user-attachments/assets/9a9a9f85-0369-469e-ab51-a4b4c15db9b4
+
 ## Français
 
 Retrouvez le menu contextuel classique ou rétablissez le comportement Windows par défaut depuis une interface Qt 6 arrondie, disponible en français comme en anglais.
 
 **[Télécharger la version portable V4.1](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/tag/V4.1)** · [Documentation et compilation](V4/README.md) · [Versions précédentes](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases)
-
-**[Vidéo de démonstration (MP4)](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.1/ContextMenuSwapper-v4.1-showcase.mp4)** — aperçu de l’application et du changement de menu dans l’Explorateur.
 
 ![Aperçu de l’interface dans la V4.0](docs/images/v4.0-main.png)
 
@@ -79,8 +81,6 @@ The HKCU workaround was tested on an **HP ProDesk 600 G1 SFF** running Windows 1
 This patch follows the two-key workaround published by Mauro Huculak. He reports testing it on build **26300.9974** after KB5132061 and restarting Explorer. [Pureinfotech guide, November 13, 2026](https://pureinfotech.com/bring-back-classic-context-menu-windows-11/)
 
 **[Download the V4.1 portable release](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/tag/V4.1)** · [Technical documentation and build instructions (French)](V4/README.md) · [Previous releases](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases)
-
-**[Video showcase (MP4)](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.1/ContextMenuSwapper-v4.1-showcase.mp4)** — see the app and the context menu switch in File Explorer.
 
 ### What's new
 
