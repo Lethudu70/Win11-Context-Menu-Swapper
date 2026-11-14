@@ -8,6 +8,8 @@ Retrouvez le menu contextuel classique ou rétablissez le comportement Windows p
 
 **[Télécharger la version portable V4.1](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/tag/V4.1)** · [Documentation et compilation](V4/README.md) · [Versions précédentes](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases)
 
+**[Vidéo de démonstration (MP4)](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.1/ContextMenuSwapper-v4.1-showcase.mp4)** — aperçu de l’application et du changement de menu dans l’Explorateur.
+
 ![Aperçu de l’interface dans la V4.0](docs/images/v4.0-main.png)
 
 **Correctif Windows 11 26H2 à partir du build 26300.9818.** La V4.1 ajoute le CLSID `{51668040-5e31-4023-bbe3-149163bd80f1}` à l’ancien override. Le mode classique configure les deux clés pour votre compte (HKCU). Le mode HKLM expérimental applique la même méthode avec UAC. Les deux clés sont sauvegardées ensemble. [Détails et sources](V4/README.md#mode-standard--hkcu)
@@ -77,6 +79,8 @@ The HKCU workaround was tested on an **HP ProDesk 600 G1 SFF** running Windows 1
 This patch follows the two-key workaround published by Mauro Huculak. He reports testing it on build **26300.9974** after KB5132061 and restarting Explorer. [Pureinfotech guide, November 13, 2026](https://pureinfotech.com/bring-back-classic-context-menu-windows-11/)
 
 **[Download the V4.1 portable release](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/tag/V4.1)** · [Technical documentation and build instructions (French)](V4/README.md) · [Previous releases](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases)
+
+**[Video showcase (MP4)](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.1/ContextMenuSwapper-v4.1-showcase.mp4)** — see the app and the context menu switch in File Explorer.
 
 ### What's new
 
