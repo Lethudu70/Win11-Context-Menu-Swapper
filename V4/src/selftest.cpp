@@ -88,6 +88,12 @@ void machineTests(const QString &directory, const std::function<void(const QStri
         Registry wrongHive(productionPath(), machine.backupPath(), Hive::CurrentUser);
         check("HKLM backup cannot be restored as HKCU", !wrongHive.canUndo() && !wrongHive.undo().ok);
         check("machine undo removes only newly created override", machine.undo().ok && machine.read().tree == absent.tree);
+        Registry pairedMachine(productionPath(), directory + "/paired-success.json", Hive::LocalMachine,
+                               false, secondaryProductionPath());
+        check("HKLM sets both defaults in the redirected hive", pairedMachine.apply(true).ok &&
+            pairedMachine.read().mode() == "classic");
+        check("HKLM undo restores both redirected registrations", pairedMachine.undo().ok &&
+            pairedMachine.read().mode() == "modern");
         HKEY original = nullptr;
         const auto child = (productionPath() + "\\InprocServer32").toStdWString();
         auto rc = RegCreateKeyExW(HKEY_LOCAL_MACHINE, child.c_str(), 0, nullptr, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, nullptr, &original, nullptr);
@@ -159,6 +165,14 @@ void machineTests(const QString &directory, const std::function<void(const QStri
                         deniedDescriptor) == ERROR_SUCCESS;
                 check("fully protected value fixture installed", deniedInstalled);
                 if (deniedInstalled) {
+                    const auto firstPath = productionPath() + "-paired-fixture";
+                    Registry paired(firstPath, directory + "/paired-machine.json", Hive::LocalMachine, false, productionPath());
+                    const auto pairedBefore = paired.read();
+                    const auto pairedFailure = paired.apply(true);
+                    const auto pairedAfter = paired.read();
+                    check("denial on the second HKLM key rolls back the first",
+                        !pairedFailure.ok && pairedFailure.windowsError == ERROR_ACCESS_DENIED &&
+                        pairedAfter.ok && pairedAfter.tree == pairedBefore.tree && pairedAfter.secondary == pairedBefore.secondary);
                     const auto deniedResult = machine.apply(true);
                     check("genuine write denial preserves the previous state", !deniedResult.ok && machine.read().tree == before.tree);
                     check("write denial identifies operation target and backup", deniedResult.message.contains("RegOpenKeyExW") &&
@@ -267,6 +281,19 @@ int selfTest(const QString &reportPath) {
     check("interrupted operation recovered", reopened.undo().ok && reopened.read().tree == conflict.tree);
     const auto cleanup = RegDeleteTreeW(HKEY_CURRENT_USER, wide.c_str());
     check("temporary test key cleaned", cleanup == ERROR_SUCCESS);
+    const auto secondary = path + "-second";
+    Registry paired(path, temp.path() + "/paired.json", Hive::CurrentUser, false, secondary);
+    Registry old(path, paired.backupPath());
+    check("existing V4.0 backup can still be undone",
+        old.apply(true).ok && paired.read().mode() == "custom" && paired.canUndo() &&
+        paired.undo().ok && paired.read().mode() == "modern");
+    check("classic writes both isolated HKCU defaults",
+        paired.apply(true).ok && paired.read().mode() == "classic" && paired.backup().value("schema") == 3);
+    const auto pairedClassic = paired.read();
+    check("modern removes both isolated overrides", paired.apply(false).ok && paired.read().mode() == "modern");
+    check("undo restores both overrides", paired.undo().ok && paired.read().tree == pairedClassic.tree &&
+        paired.read().secondary == pairedClassic.secondary);
+    check("dual-key test data removed", paired.apply(false).ok && paired.read().mode() == "modern");
     machineTests(temp.path(), check);
     cacheTests(temp.path(), check);
     const QJsonObject report{{"passed", passed}, {"isolatedKey", path}, {"checks", checks},

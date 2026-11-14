@@ -1,4 +1,4 @@
-# Inno Setup — Context Menu Swapper v4.0
+# Inno Setup — Context Menu Swapper v4.1
 
 [Français](#français) · [English](#english)
 
@@ -16,13 +16,13 @@ Il ne demande pas les droits administrateur et ne modifie pas le menu Windows. L
 
 Utiliser **Inno Setup 6.7 ou ultérieur** avec son pack de langues officiel. Les images PNG sont fournies ; les sources SVG et `make_artwork.py` permettent de les régénérer avec librsvg et Pillow.
 
-Extraire le ZIP portable de la release V4.0, puis depuis la racine du dépôt :
+Extraire le ZIP portable de la release V4.1, puis depuis la racine du dépôt :
 
 ```powershell
 .\V4\scripts\build-installer.ps1 -PortableDirectory 'C:\chemin\vers\le\portable' -OutputDirectory 'C:\chemin\vers\la\sortie'
 ```
 
-Le script produit `ContextMenuSwapper-v4.0-Setup.exe` et son fichier `.sha256`. Les DLL et l'exécutable installés proviennent du portable, sans recompilation du programme.
+Le script produit `ContextMenuSwapper-v4.1-Setup.exe` et son fichier `.sha256`. Les DLL et l'exécutable installés proviennent du portable, sans recompilation du programme.
 
 `V4/scripts/test-installer.ps1` vérifie l'installation, les empreintes des fichiers, les icônes/raccourcis, le test du programme installé et la désinstallation. Il refuse de s'exécuter si une installation existante ou le groupe de raccourcis cible risquent d'être modifiés. Utiliser un compte de test ou une VM pour ces essais.
 
@@ -38,8 +38,8 @@ Installation does not request administrator rights or change the Windows context
 
 ### Build
 
-Use **Inno Setup 6.7 or later** with its official language files. Extract the published V4.0 portable ZIP and run `V4/scripts/build-installer.ps1` with `-PortableDirectory` and `-OutputDirectory`. Pre-rendered PNG assets are included; SVG sources and `make_artwork.py` allow regeneration with librsvg and Pillow.
+Use **Inno Setup 6.7 or later** with its official language files. Extract the published V4.1 portable ZIP and run `V4/scripts/build-installer.ps1` with `-PortableDirectory` and `-OutputDirectory`. Pre-rendered PNG assets are included; SVG sources and `make_artwork.py` allow regeneration with librsvg and Pillow.
 
-The script creates `ContextMenuSwapper-v4.0-Setup.exe` and its `.sha256` file. The installed executable and libraries come from the portable release; the application is not rebuilt.
+The script creates `ContextMenuSwapper-v4.1-Setup.exe` and its `.sha256` file. The installed executable and libraries come from the portable release; the application is not rebuilt.
 
 The installer test checks file hashes, uninstall registration, shortcuts/icons, the installed application's self-test and uninstallation. It refuses to overwrite an existing installation or shortcut group. Use an isolated test account or virtual machine.

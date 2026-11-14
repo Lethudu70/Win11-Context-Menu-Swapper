@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("LethTools");
     QCoreApplication::setApplicationName("ContextMenuSwapperV4");
-    QCoreApplication::setApplicationVersion("4.0.0");
+    QCoreApplication::setApplicationVersion("4.1.0");
     // File-based settings; no settings writes to HKCU.
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QCommandLineParser parser;
@@ -35,7 +35,8 @@ int main(int argc, char **argv) {
         QMessageBox::information(nullptr, "Context Menu Swapper", "Une instance est déjà ouverte / An instance is already running.");
         return 1;
     }
-    cms::Registry registry(cms::productionPath(), directory + "/last-change.json");
+    cms::Registry registry(cms::productionPath(), directory + "/last-change.json",
+                           cms::Hive::CurrentUser, false, cms::secondaryProductionPath());
     cms::Window window(registry); window.show();
     if (parser.isSet("preview")) window.capture(parser.value("preview"));
     return app.exec();

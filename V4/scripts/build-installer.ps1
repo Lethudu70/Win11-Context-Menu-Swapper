@@ -24,10 +24,10 @@ $out = (Resolve-Path -LiteralPath $OutputDirectory).Path
 $script = Join-Path $sourceRoot 'installer\ContextMenuSwapper.iss'
 & $Compiler "/DPayloadDir=$payload" "/DInstallerOutput=$out" $script
 if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed ($LASTEXITCODE)" }
-$installer = Join-Path $out 'ContextMenuSwapper-v4.0-Setup.exe'
+$installer = Join-Path $out 'ContextMenuSwapper-v4.1-Setup.exe'
 if (-not (Test-Path -LiteralPath $installer)) { throw 'Inno Setup did not create the expected setup EXE.' }
-$sumFile = Join-Path $out 'ContextMenuSwapper-v4.0-Setup.sha256'
+$sumFile = Join-Path $out 'ContextMenuSwapper-v4.1-Setup.sha256'
 $sum = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
-[IO.File]::WriteAllText($sumFile, "$sum  ContextMenuSwapper-v4.0-Setup.exe" + [Environment]::NewLine, [Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText($sumFile, "$sum  ContextMenuSwapper-v4.1-Setup.exe" + [Environment]::NewLine, [Text.UTF8Encoding]::new($false))
 Write-Host "Installer: $installer"
 Write-Host "SHA-256: $sum"

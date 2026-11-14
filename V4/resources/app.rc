@@ -2,8 +2,8 @@
 IDI_ICON1 ICON "app.ico"
 1 RT_MANIFEST "app.manifest"
 1 VERSIONINFO
- FILEVERSION 4,0,0,0
- PRODUCTVERSION 4,0,0,0
+ FILEVERSION 4,1,0,0
+ PRODUCTVERSION 4,1,0,0
  FILEFLAGSMASK 0x3fL
  FILEFLAGS 0x0L
  FILEOS VOS_NT_WINDOWS32
@@ -14,12 +14,12 @@ BEGIN
   BLOCK "040904B0"
   BEGIN
    VALUE "CompanyName", "LethTools\0"
-   VALUE "FileDescription", "Context Menu Swapper v4.0 - Leth Edition\0"
-   VALUE "FileVersion", "4.0.0\0"
+   VALUE "FileDescription", "Context Menu Swapper v4.1 - Leth Edition\0"
+   VALUE "FileVersion", "4.1.0\0"
    VALUE "InternalName", "ContextMenuSwapper\0"
    VALUE "OriginalFilename", "ContextMenuSwapper.exe\0"
    VALUE "ProductName", "Context Menu Swapper\0"
-   VALUE "ProductVersion", "4.0.0\0"
+   VALUE "ProductVersion", "4.1.0\0"
   END
  END
  BLOCK "VarFileInfo"

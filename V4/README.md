@@ -1,10 +1,10 @@
-# Context Menu Swapper v4.0 — Leth Edition
+# Context Menu Swapper v4.1 — Leth Edition
 
 Application Windows x64 en C++17 et Qt 6 Widgets, compilée avec MSYS2 **UCRT64**, CMake et Ninja.
 
 ## Version portable et interface
 
-Extraire tout le ZIP de la release V4.0, puis lancer `ContextMenuSwapper.exe`. Garder les DLL à côté de l'EXE et les plugins dans leurs sous-dossiers, notamment `platforms/qwindows.dll`. Aucun Python ni MSYS2 n'est nécessaire sur le PC destinataire.
+Extraire tout le ZIP de la release V4.1, puis lancer `ContextMenuSwapper.exe`. Garder les DLL à côté de l'EXE et les plugins dans leurs sous-dossiers, notamment `platforms/qwindows.dll`. Aucun Python ni MSYS2 n'est nécessaire sur le PC destinataire.
 
 La fenêtre est arrondie, sans barre de titre Windows, avec boutons **−** et **×**. La déplacer par sa barre de titre ; double-cliquer dessus pour agrandir/restaurer. La poignée en bas à droite permet de redimensionner. L'interface propose le français, l'anglais, un thème sombre Leth et un thème système.
 
@@ -18,13 +18,16 @@ La fiche système lit le nom/édition de Windows, la version, la build avec sa r
 4. Redémarrer Explorer via le bouton dédié, ou se déconnecter/reconnecter plus tard.
 5. **Annuler le changement** restaure l'état précédant la dernière modification.
 
-Clé ciblée :
+Clés ciblées :
 
 ```text
 HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}
+HKCU\Software\Classes\CLSID\{51668040-5e31-4023-bbe3-149163bd80f1}
 ```
 
-Le mode classique écrit une chaîne vide REG_SZ dans la valeur par défaut de `InprocServer32`, en préservant les autres valeurs. Le retour au comportement Windows par défaut retire cette clé CLSID après sauvegarde. Les clés existantes sont ouvertes avec le seul droit `KEY_SET_VALUE` pour l'écriture.
+Le mode classique écrit une chaîne vide REG_SZ dans la valeur par défaut de `InprocServer32` sur les deux clés, en préservant les autres valeurs. Le retour au comportement Windows par défaut retire les deux clés CLSID après sauvegarde. Les clés existantes sont ouvertes avec le seul droit `KEY_SET_VALUE` pour l'écriture. La V4.1 utilise un seul snapshot pour les deux clés et accepte les snapshots à une clé de la V4.0.
+
+Ce correctif vise le menu personnalisable de l’Explorateur de Windows 11 26H2 à partir du build **26300.9818** (KB5127936), dont **26300.9974** (KB5132061). Le contournement en HKCU a été confirmé manuellement par l’auteur sur un HP en 26300.9818. Microsoft documente le nouveau menu et les builds. La seconde clé est un contournement communautaire. [Notes Microsoft sur le menu](https://learn.microsoft.com/windows-insider/release-notes/release-preview-24h2-25h2/build-26200-9807-26300-9807) · [Historique des builds](https://learn.microsoft.com/en-us/windows/release-health/windows11-release-information) · [Signalement et retours de test](https://github.com/memstechtips/Winhance/issues/814)
 
 Le snapshot JSON conserve sous-clés, types et octets des valeurs. Il est enregistré atomiquement dans `last-change.json` sous le dossier AppLocalDataLocation de l'application. Un verrou empêche deux instances de modifier l'historique utilisateur. Une nouvelle modification remplace l'annulation précédente. Les préférences INI sont gérées par QSettings dans le profil utilisateur.
 
@@ -32,7 +35,7 @@ Une restauration est refusée si la configuration a changé ailleurs. Une opéra
 
 ## HKLM expérimental et UAC
 
-**EXPÉRIMENTAL — NON RECOMMANDÉ AUX UTILISATEURS STANDARD.** L'option est décochée à chaque lancement. Elle cible la même clé CLSID sous **HKLM**, dans la vue 64 bits, et peut affecter tous les comptes du PC. Un override HKCU peut rester prioritaire ; l'application ne le supprime pas automatiquement.
+**EXPÉRIMENTAL — NON RECOMMANDÉ AUX UTILISATEURS STANDARD.** L'option est décochée à chaque lancement. Elle cible les deux mêmes clés CLSID sous **HKLM**, dans la vue 64 bits, et peut affecter tous les comptes du PC. Un override HKCU peut rester prioritaire ; l'application ne le supprime pas automatiquement.
 
 **Appliquer en HKLM… (UAC)** lance le même EXE via `runas` dans un processus séparé. Windows affiche le consentement UAC ou demande les identifiants d'un administrateur selon sa politique. L'application principale reste dans son contexte initial. Si elle était déjà élevée ou si l'UAC est désactivé, Windows peut ne pas demander une nouvelle autorisation.
 
@@ -100,4 +103,4 @@ Les tests automatisés ne remplacent pas une vérification du menu réel, de l'U
 
 Les DLL Qt et tierces sont liées dynamiquement et conservent leurs licences. `licenses/` rassemble les notices disponibles dans l'installation UCRT64. La redistribution reste soumise aux obligations applicables, notamment celles de Qt LGPL. Le dépôt n'attribue pas encore de licence propre au code du projet.
 
-Les versions historiques restent disponibles. Les sources de la v4.0 sont dans `V4/src`, les ressources dans `V4/resources` et les scripts dans `V4/scripts`. Les DLL et exécutables générés sont distribués via GitHub Releases.
+Les versions historiques restent disponibles. Les sources de la v4.1 sont dans `V4/src`, les ressources dans `V4/resources` et les scripts dans `V4/scripts`. Les DLL et exécutables générés sont distribués via GitHub Releases.

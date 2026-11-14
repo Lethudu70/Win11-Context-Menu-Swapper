@@ -1,14 +1,18 @@
-# Win11 Context Menu Swapper — v4.0
+# Win11 Context Menu Swapper — v4.1
 
-[Français](#français) · [English](#english) · [Release notes FR/EN](docs/RELEASE_NOTES-v4.0.md)
+[Français](#français) · [English](#english) · [Release notes FR/EN](docs/RELEASE_NOTES-v4.1.md)
 
 ## Français
 
 Retrouvez le menu contextuel classique ou rétablissez le comportement Windows par défaut depuis une interface Qt 6 arrondie, disponible en français comme en anglais.
 
-**[Télécharger la version portable V4.0](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/tag/V4.0)** · [Documentation et compilation](V4/README.md) · [Versions précédentes](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases)
+**[Télécharger la version portable V4.1](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/tag/V4.1)** · [Documentation et compilation](V4/README.md) · [Versions précédentes](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases)
 
-![Interface de Context Menu Swapper v4.0](docs/images/v4.0-main.png)
+![Aperçu de l’interface dans la V4.0](docs/images/v4.0-main.png)
+
+**Correctif Windows 11 26H2 à partir du build 26300.9818.** La V4.1 ajoute le CLSID `{51668040-5e31-4023-bbe3-149163bd80f1}` à l’ancien override. Le mode classique configure les deux clés pour votre compte (HKCU). Le mode HKLM expérimental applique la même méthode avec UAC. Les deux clés sont sauvegardées ensemble. [Détails et sources](V4/README.md#mode-standard--hkcu)
+
+La manipulation HKCU a été testée sur un **HP ProDesk 600 G1 SFF** sous Windows 11 Pro 26H2 **26300.9818**. [Configuration complète du PC de test](docs/RELEASE_NOTES-v4.1.md#configuration-de-test)
 
 ### Les nouveautés
 
@@ -23,11 +27,11 @@ Retrouvez le menu contextuel classique ou rétablissez le comportement Windows p
 
 ### Installer et utiliser
 
-**Avec installation :** téléchargez **[ContextMenuSwapper-v4.0-Setup.exe](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.0/ContextMenuSwapper-v4.0-Setup.exe)** et suivez l'assistant Inno Setup noir/vert. Le **français est sélectionné par défaut** ; l'anglais est disponible au démarrage. L'installation est personnelle, avec icône dans Applications installées, raccourci du menu Démarrer et raccourci Bureau optionnel. Elle ne change pas votre menu Windows. [Voir le setup](docs/images/setup-v4.0-fr.png).
+**Avec installation :** téléchargez **[ContextMenuSwapper-v4.1-Setup.exe](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.1/ContextMenuSwapper-v4.1-Setup.exe)** et suivez l'assistant Inno Setup noir/vert. Le **français est sélectionné par défaut** ; l'anglais est disponible au démarrage. L'installation est personnelle, avec icône dans Applications installées, raccourci du menu Démarrer et raccourci Bureau optionnel. Elle ne change pas votre menu Windows. [Voir le setup](docs/images/setup-v4.0-fr.png).
 
 **Sans installation :** utilisez le ZIP portable :
 
-1. Téléchargez `ContextMenuSwapper-v4.0-win64-portable.zip` depuis la release V4.0.
+1. Téléchargez `ContextMenuSwapper-v4.1-win64-portable.zip` depuis la release V4.1.
 2. Extrayez **tout le ZIP** dans un dossier de votre choix.
 3. Lancez `ContextMenuSwapper.exe`. Conservez les DLL et les sous-dossiers, notamment `platforms`.
 4. Choisissez le menu classique ou le comportement Windows par défaut, puis cliquez sur **Appliquer la sélection**.
@@ -45,7 +49,7 @@ L'effet de l'override dépend de la build de Windows et des politiques du PC. Un
 
 ### Compiler soi-même
 
-Le code de la v4.0 se trouve dans `V4/`. Il utilise **C++17, Qt 6 Widgets, MSYS2 UCRT64, CMake et Ninja**.
+Le code de la v4.1 se trouve dans `V4/`. Il utilise **C++17, Qt 6 Widgets, MSYS2 UCRT64, CMake et Ninja**.
 
 ```powershell
 cd V4
@@ -62,9 +66,13 @@ La V3 C++ et la version Python historique sont conservées dans le dépôt et le
 
 ## English
 
-Context Menu Swapper v4.0 lets you restore the classic context menu or return to the default Windows behavior from a rounded Qt 6 interface, available in French and English.
+Context Menu Swapper v4.1 lets you restore the classic context menu or return to the default Windows behavior from a rounded Qt 6 interface, available in French and English.
 
-**[Download the V4.0 portable release](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/tag/V4.0)** · [Technical documentation and build instructions (French)](V4/README.md) · [Previous releases](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases)
+**Windows 11 26H2 patch for build 26300.9818 onward.** V4.1 adds CLSID `{51668040-5e31-4023-bbe3-149163bd80f1}` alongside the original override. Classic mode configures both keys for your account (HKCU). Experimental HKLM mode uses the same method with UAC. Both keys are backed up together. [Details and sources](V4/README.md#mode-standard--hkcu)
+
+The HKCU workaround was tested on an **HP ProDesk 600 G1 SFF** running Windows 11 Pro 26H2 **26300.9818**. [Full test system specifications](docs/RELEASE_NOTES-v4.1.md#test-system)
+
+**[Download the V4.1 portable release](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/tag/V4.1)** · [Technical documentation and build instructions (French)](V4/README.md) · [Previous releases](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases)
 
 ### What's new
 
@@ -79,11 +87,11 @@ Context Menu Swapper v4.0 lets you restore the classic context menu or return to
 
 ### Installation and use
 
-**Installer option:** download **[ContextMenuSwapper-v4.0-Setup.exe](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.0/ContextMenuSwapper-v4.0-Setup.exe)** and follow the dark green/black Inno Setup wizard. **French is selected by default**; English is available at startup. It installs for your account, with an Installed Apps icon, a Start menu shortcut and an optional desktop shortcut. Installation does not change your Windows context menu. [Preview setup](docs/images/setup-v4.0-en.png).
+**Installer option:** download **[ContextMenuSwapper-v4.1-Setup.exe](https://github.com/Lethudu70/Win11-Context-Menu-Swapper/releases/download/V4.1/ContextMenuSwapper-v4.1-Setup.exe)** and follow the dark green/black Inno Setup wizard. **French is selected by default**; English is available at startup. It installs for your account, with an Installed Apps icon, a Start menu shortcut and an optional desktop shortcut. Installation does not change your Windows context menu. [Preview setup](docs/images/setup-v4.0-en.png).
 
 **Portable option:** use the ZIP package:
 
-1. Download `ContextMenuSwapper-v4.0-win64-portable.zip` from the V4.0 release.
+1. Download `ContextMenuSwapper-v4.1-win64-portable.zip` from the V4.1 release.
 2. Extract **the entire ZIP** into a folder of your choice.
 3. Run `ContextMenuSwapper.exe`. Keep its DLLs and subfolders, especially `platforms`.
 4. Select the classic menu or the default Windows behavior, then click **Apply selection**.
@@ -101,7 +109,7 @@ The override's effect depends on the Windows build and system policies. A verifi
 
 ### Build from source
 
-The v4.0 source is in `V4/`. It uses **C++17, Qt 6 Widgets, MSYS2 UCRT64, CMake and Ninja**.
+The v4.1 source is in `V4/`. It uses **C++17, Qt 6 Widgets, MSYS2 UCRT64, CMake and Ninja**.
 
 ```powershell
 cd V4

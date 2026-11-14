@@ -1,8 +1,8 @@
-name: Build and publish V4 Windows portable
+name: Build and publish V4 Windows packages
 on:
   workflow_dispatch:
   push:
-    paths: ['V4/**', '.github/workflows/build-v4.yml']
+    paths: ['V4/**', 'docs/RELEASE_NOTES-v4.1.md', '.github/workflows/build-v4.yml']
   pull_request:
     paths: ['V4/**', '.github/workflows/build-v4.yml']
 permissions:
@@ -40,6 +40,8 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
+    concurrency:
+      group: publish-context-menu-swapper-v4.1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,24 +50,38 @@ jobs:
         with:
           name: ContextMenuSwapper-V4-win64
           path: release-assets
-      - name: Publish V4.0
+      - name: Build and test the V4.1 installer
+        shell: pwsh
+        run: |
+          $archives = @(Get-ChildItem -LiteralPath release-assets -Filter '*.zip' -File)
+          if ($archives.Count -ne 1) { throw 'Expected exactly one tested portable ZIP' }
+          $portable = Join-Path $PWD 'release-assets/ContextMenuSwapper-v4.1-win64-portable.zip'
+          Move-Item -LiteralPath $archives[0].FullName -Destination $portable
+          Expand-Archive -LiteralPath $portable -DestinationPath "$env:RUNNER_TEMP/portable"
+          $apps = @(Get-ChildItem "$env:RUNNER_TEMP/portable" -Recurse -File -Filter ContextMenuSwapper.exe)
+          if ($apps.Count -ne 1) { throw 'Expected one portable executable' }
+          choco upgrade innosetup --yes --no-progress
+          if ($LASTEXITCODE -notin @(0,3010)) { throw 'Inno Setup installation failed' }
+          ./V4/scripts/build-installer.ps1 -PortableDirectory $apps[0].DirectoryName -OutputDirectory "$PWD/release-assets"
+          ./V4/scripts/test-installer.ps1 -Installer "$PWD/release-assets/ContextMenuSwapper-v4.1-Setup.exe" -PortableDirectory $apps[0].DirectoryName -ReportDirectory "$env:RUNNER_TEMP/test"
+          exit 0
+      - name: Publish V4.1
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           SOURCE_COMMIT: ${{ github.sha }}
         run: |
-          gh release view V4.0 --json tagName 2>$null
+          gh release view V4.1 --json tagName 2>$null
           if ($LASTEXITCODE -eq 0) {
-            Write-Host 'Release V4.0 already exists; keeping the published files.'
+            Write-Host 'Release V4.1 already exists; keeping the published files.'
             exit 0
           }
-          $archives = @(Get-ChildItem -LiteralPath release-assets -Filter '*.zip' -File)
-          if ($archives.Count -ne 1) { throw 'Expected exactly one tested portable ZIP' }
-          $portable = Join-Path $PWD 'release-assets/ContextMenuSwapper-v4.0-win64-portable.zip'
-          Move-Item -LiteralPath $archives[0].FullName -Destination $portable
+          $portable = Join-Path $PWD 'release-assets/ContextMenuSwapper-v4.1-win64-portable.zip'
+          $setup = Join-Path $PWD 'release-assets/ContextMenuSwapper-v4.1-Setup.exe'
           $checksum = (Get-FileHash -LiteralPath $portable -Algorithm SHA256).Hash.ToLowerInvariant()
           $sumFile = Join-Path $PWD 'release-assets/SHA256SUMS.txt'
-          "$checksum  ContextMenuSwapper-v4.0-win64-portable.zip" | Set-Content -LiteralPath $sumFile -Encoding utf8NoBOM
-          gh release create V4.0 $portable $sumFile --target $env:SOURCE_COMMIT --title 'V4.0 — Leth Edition' --notes-file V4/RELEASE_NOTES.md --latest
+          $setupChecksum = (Get-Content -LiteralPath "$PWD/release-assets/ContextMenuSwapper-v4.1-Setup.sha256").Trim()
+          @("$checksum  ContextMenuSwapper-v4.1-win64-portable.zip", $setupChecksum) | Set-Content -LiteralPath $sumFile -Encoding utf8NoBOM
+          gh release create V4.1 $portable $setup $sumFile --target $env:SOURCE_COMMIT --title 'V4.1 — Windows 11 26H2 patch' --notes-file docs/RELEASE_NOTES-v4.1.md --latest
           if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }

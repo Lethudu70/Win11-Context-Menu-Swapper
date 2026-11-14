@@ -29,7 +29,7 @@ banner = f'''<svg xmlns="http://www.w3.org/2000/svg" width="492" height="942" vi
 <text x="44" y="585" fill="#f1fff6" font-family="Segoe UI, sans-serif" font-size="39" font-weight="700">CONTEXT MENU</text>
 <text x="44" y="639" fill="#f1fff6" font-family="Segoe UI, sans-serif" font-size="52" font-weight="700">SWAPPER</text>
 <rect x="46" y="684" width="172" height="55" rx="15" fill="#10281c" stroke="#4b9568"/>
-<text x="132" y="722" text-anchor="middle" fill="#83f3b3" font-family="Segoe UI, sans-serif" font-size="29" font-weight="600">v4.0</text>
+<text x="132" y="722" text-anchor="middle" fill="#83f3b3" font-family="Segoe UI, sans-serif" font-size="29" font-weight="600">v4.1</text>
 <path d="M46 811H446" stroke="#4d8b65" stroke-opacity=".5"/>
 <text x="46" y="855" fill="#b5d3c1" font-family="Segoe UI, sans-serif" font-size="21" letter-spacing="2">WINDOWS · x64</text>
 <text x="46" y="894" fill="#6d9e83" font-family="Segoe UI, sans-serif" font-size="18" letter-spacing="3">LETH EDITION</text>

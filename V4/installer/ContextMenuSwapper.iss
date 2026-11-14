@@ -1,11 +1,11 @@
 ﻿#ifndef PayloadDir
-  #error PayloadDir must point to the verified V4.0 portable directory.
+  #error PayloadDir must point to the verified V4.1 portable directory.
 #endif
 #ifndef InstallerOutput
   #define InstallerOutput "..\dist\setup"
 #endif
 #define AppName "Context Menu Swapper"
-#define AppVersion "4.0.0"
+#define AppVersion "4.1.0"
 #define AppExe "ContextMenuSwapper.exe"
 #define ProjectURL "https://github.com/Lethudu70/Win11-Context-Menu-Swapper"
 
@@ -13,11 +13,11 @@
 AppId={{786E729A-5920-4855-A954-A209C9227904}
 AppName={#AppName}
 AppVersion={#AppVersion}
-AppVerName={#AppName} v4.0 - Leth Edition
+AppVerName={#AppName} v4.1 - Leth Edition
 AppPublisher=Lethudu70
 AppPublisherURL={#ProjectURL}
 AppSupportURL={#ProjectURL}/issues
-AppUpdatesURL={#ProjectURL}/releases/tag/V4.0
+AppUpdatesURL={#ProjectURL}/releases/tag/V4.1
 DefaultDirName={localappdata}\Programs\LethTools\ContextMenuSwapper
 DefaultGroupName=LethTools\Context Menu Swapper
 DisableProgramGroupPage=yes
@@ -27,11 +27,11 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 SetupIconFile=..\resources\app.ico
 UninstallDisplayIcon={app}\{#AppExe}
-UninstallDisplayName={#AppName} v4.0 - Leth Edition
+UninstallDisplayName={#AppName} v4.1 - Leth Edition
 OutputDir={#InstallerOutput}
-OutputBaseFilename=ContextMenuSwapper-v4.0-Setup
+OutputBaseFilename=ContextMenuSwapper-v4.1-Setup
 VersionInfoVersion={#AppVersion}
-VersionInfoDescription=Context Menu Swapper v4.0 Setup - Leth Edition
+VersionInfoDescription=Context Menu Swapper v4.1 Setup - Leth Edition
 VersionInfoProductName={#AppName}
 VersionInfoProductVersion={#AppVersion}
 Compression=lzma2
@@ -65,8 +65,8 @@ Name: "french"; MessagesFile: "compiler:Languages\French.isl"; InfoBeforeFile: "
 Name: "english"; MessagesFile: "compiler:Default.isl"; InfoBeforeFile: "info-en.txt"
 
 [Messages]
-french.WelcomeLabel1=Bienvenue dans Context Menu Swapper v4.0
-english.WelcomeLabel1=Welcome to Context Menu Swapper v4.0
+french.WelcomeLabel1=Bienvenue dans Context Menu Swapper v4.1
+english.WelcomeLabel1=Welcome to Context Menu Swapper v4.1
 french.WelcomeLabel2=Une interface claire pour choisir votre menu contextuel Windows.%n%nCet assistant installe l'application, ses bibliothèques et ses raccourcis pour votre compte.%n%nLes réglages du menu se choisissent ensuite dans l'application.
 english.WelcomeLabel2=A clear interface for choosing your Windows context menu.%n%nThis wizard installs the app, its libraries and shortcuts for your account.%n%nChoose your menu settings afterward, inside the application.
 french.FinishedHeadingLabel=Context Menu Swapper est prêt
@@ -89,8 +89,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "{#PayloadDir}\*"; DestDir: "{app}"; Excludes: "self-test.json,manifest-sha256.json"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\Context Menu Swapper v4.0"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; IconFilename: "{app}\{#AppExe}"; Comment: "{cm:ShortcutComment}"; AppUserModelID: "LethTools.ContextMenuSwapper"
-Name: "{autodesktop}\Context Menu Swapper v4.0"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; IconFilename: "{app}\{#AppExe}"; Tasks: desktopicon; Comment: "{cm:ShortcutComment}"
+Name: "{group}\Context Menu Swapper v4.1"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; IconFilename: "{app}\{#AppExe}"; Comment: "{cm:ShortcutComment}"; AppUserModelID: "LethTools.ContextMenuSwapper"
+Name: "{autodesktop}\Context Menu Swapper v4.1"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; IconFilename: "{app}\{#AppExe}"; Tasks: desktopicon; Comment: "{cm:ShortcutComment}"
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchApp}"; Flags: nowait postinstall skipifsilent

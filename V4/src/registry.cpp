@@ -149,25 +149,46 @@ QJsonObject classicTree(QJsonObject tree) {
 QString productionPath() {
     return QStringLiteral("Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
 }
+QString secondaryProductionPath() {
+    return QStringLiteral("Software\\Classes\\CLSID\\{51668040-5e31-4023-bbe3-149163bd80f1}");
+}
 QString machineBackupKey() { return QStringLiteral("Software\\LethTools\\ContextMenuSwapperV4\\MachineBackup"); }
-Registry::Registry(QString path, QString backupPath, Hive hive, bool allowProtectedWrite)
-    : path_(std::move(path)), backup_(std::move(backupPath)), hive_(hive), allowProtectedWrite_(allowProtectedWrite) {}
+Registry::Registry(QString path, QString backupPath, Hive hive, bool allowProtectedWrite, QString secondaryPath)
+    : path_(std::move(path)), backup_(std::move(backupPath)), secondaryPath_(std::move(secondaryPath)),
+      hive_(hive), allowProtectedWrite_(allowProtectedWrite) {}
+QString Registry::targets() const {
+    const auto prefix = hiveName() + "\\";
+    return prefix + path_ + (secondaryPath_.isEmpty() ? QString{} : "\n" + prefix + secondaryPath_);
+}
 void *Registry::root() const { return machine() ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER; }
 QString Registry::backupPath() const {
     return machine() && backup_.isEmpty() ? "HKLM\\" + machineBackupKey() + "\\LastChange" : backup_;
 }
 State Registry::read() const {
+    auto primary = readSingle(path_);
+    if (!primary.ok || secondaryPath_.isEmpty()) return primary;
+    const auto secondary = readSingle(secondaryPath_);
+    if (!secondary.ok) return secondary;
+    primary.secondary = secondary.tree;
+    return primary;
+}
+State Registry::readSingle(const QString &target) const {
     Key key;
-    const auto path = path_.toStdWString();
+    const auto path = target.toStdWString();
     const auto rc = RegOpenKeyExW(static_cast<HKEY>(root()), path.c_str(), 0, KEY_READ | KEY_WOW64_64KEY, &key.h);
-    if (rc == ERROR_FILE_NOT_FOUND || rc == ERROR_PATH_NOT_FOUND) return {true, {{"exists", false}}, {}};
-    if (rc != ERROR_SUCCESS) return {false, {}, errorText(rc)};
+    if (rc == ERROR_FILE_NOT_FOUND || rc == ERROR_PATH_NOT_FOUND) return {true, {{"exists", false}}, {}, {}};
+    if (rc != ERROR_SUCCESS) return {false, {}, errorText(rc), {}};
     QJsonObject tree; QString error;
-    if (!readTree(key.h, tree, error)) return {false, {}, error};
-    return {true, tree, {}};
+    if (!readTree(key.h, tree, error)) return {false, {}, error, {}};
+    return {true, tree, {}, {}};
 }
 QString State::mode() const {
     if (!ok) return "error";
+    if (!secondary.isEmpty()) {
+        const auto first = State{true, tree, {}, {}}.mode();
+        const auto second = State{true, secondary, {}, {}}.mode();
+        return first == second ? first : QStringLiteral("custom");
+    }
     if (!tree.value("exists").toBool()) return "modern";
     const auto children = tree.value("children").toObject();
     QJsonObject inproc;
@@ -178,9 +199,9 @@ QString State::mode() const {
         return "classic";
     return "custom";
 }
-Result Registry::restore(const QJsonObject &tree) {
-    if (!validTree(tree) || path_.isEmpty()) return {false, "Invalid snapshot"};
-    const auto path = path_.toStdWString();
+Result Registry::restore(const QString &target, const QJsonObject &tree) {
+    if (!validTree(tree) || target.isEmpty()) return {false, "Invalid snapshot"};
+    const auto path = target.toStdWString();
     // HKLM classic only changes the InprocServer32 default. Restore that value in
     // place to retain the original system registration and its access controls.
     if (machine() && tree.value("exists").toBool()) {
@@ -188,7 +209,7 @@ Result Registry::restore(const QJsonObject &tree) {
         QJsonObject inproc;
         for (auto it = children.begin(); it != children.end(); ++it)
             if (it.key().compare("InprocServer32", Qt::CaseInsensitive) == 0) inproc = it.value().toObject();
-        const auto childPath = (path_ + "\\InprocServer32").toStdWString();
+        const auto childPath = (target + "\\InprocServer32").toStdWString();
         LSTATUS rc = ERROR_SUCCESS;
         if (!inproc.value("exists").toBool()) {
             rc = RegDeleteTreeW(static_cast<HKEY>(root()), childPath.c_str());
@@ -212,8 +233,8 @@ Result Registry::restore(const QJsonObject &tree) {
             }
         }
         if (rc != ERROR_SUCCESS) return {false, errorText(rc), static_cast<unsigned long>(rc)};
-        const auto actual = read();
-        return {actual.ok && actual.tree == tree, actual.ok ? "HKLM restoration verified" : actual.error};
+        const auto actual = readSingle(target);
+        return {actual.ok && actual.tree == tree, actual.ok ? "HKLM restoration verification" : actual.error};
     }
     auto rc = RegDeleteTreeW(static_cast<HKEY>(root()), path.c_str());
     if (rc != ERROR_SUCCESS && rc != ERROR_FILE_NOT_FOUND && rc != ERROR_PATH_NOT_FOUND)
@@ -224,7 +245,7 @@ Result Registry::restore(const QJsonObject &tree) {
         if (rc == ERROR_SUCCESS) rc = writeTree(key.h, tree);
         if (rc != ERROR_SUCCESS) return {false, errorText(rc)};
     }
-    const auto actual = read();
+    const auto actual = readSingle(target);
     return {actual.ok && actual.tree == tree, actual.ok ? QStringLiteral("Registry verification") : actual.error};
 }
 QJsonObject Registry::backup() const {
@@ -246,7 +267,11 @@ QJsonObject Registry::backup() const {
     const bool legacyUser = record.value("schema").toInt() == 1 && !machine() && !record.contains("hive");
     const bool scoped = record.value("schema").toInt() == 2 && record.value("hive").toString() == hiveName() &&
                         record.value("view").toString() == "64";
-    if ((!legacyUser && !scoped) || record.value("path").toString() != path_ ||
+    const bool paired = record.value("schema").toInt() == 3 && !secondaryPath_.isEmpty() &&
+        record.value("hive").toString() == hiveName() && record.value("view").toString() == "64" &&
+        record.value("secondaryPath").toString() == secondaryPath_ &&
+        validTree(record.value("secondaryBefore").toObject()) && validTree(record.value("secondaryAfter").toObject());
+    if ((!legacyUser && !scoped && !paired) || record.value("path").toString() != path_ ||
         !validTree(record.value("before").toObject()) || !validTree(record.value("after").toObject())) return {};
     return record;
 }
@@ -255,7 +280,7 @@ bool Registry::canUndo() const {
     return !r.isEmpty() && r.value("status").toString() != "undone";
 }
 Result Registry::writeBackup(const QJsonObject &record) const {
-    const auto data = QJsonDocument(record).toJson(QJsonDocument::Indented);
+    const auto data = QJsonDocument(record).toJson(QJsonDocument::Compact);
     if (machine() && backup_.isEmpty()) {
         // Machine snapshots are never loaded from a user-writable file.
         PSECURITY_DESCRIPTOR descriptor = nullptr;
@@ -278,6 +303,36 @@ Result Registry::writeBackup(const QJsonObject &record) const {
     if (file.write(data) != data.size() || !file.commit()) return {false, file.errorString()};
     return {true, {}};
 }
+Result Registry::setClassic(const QString &target, const QJsonObject &before) {
+    Key key;
+    const auto p = (target + "\\InprocServer32").toStdWString();
+    QString stage = "RegOpenKeyExW (KEY_SET_VALUE)";
+    auto rc = RegOpenKeyExW(static_cast<HKEY>(root()), p.c_str(), 0,
+                           KEY_SET_VALUE | KEY_WOW64_64KEY, &key.h);
+    // Existing system registrations may allow updating a value but forbid
+    // creating children. Do not request KEY_WRITE/KEY_CREATE_SUB_KEY here.
+    if (rc == ERROR_FILE_NOT_FOUND || rc == ERROR_PATH_NOT_FOUND) {
+        stage = "RegCreateKeyExW (KEY_SET_VALUE)";
+        rc = RegCreateKeyExW(static_cast<HKEY>(root()), p.c_str(), 0, nullptr, 0,
+                            KEY_SET_VALUE | KEY_WOW64_64KEY, nullptr, &key.h, nullptr);
+    }
+    bool existed = false;
+    const auto children = before.value("children").toObject();
+    for (auto it = children.begin(); it != children.end(); ++it)
+        if (it.key().compare("InprocServer32", Qt::CaseInsensitive) == 0) existed = true;
+    if (rc == ERROR_ACCESS_DENIED && machine() && allowProtectedWrite_ && existed) {
+        stage = "RegCreateKeyExW (REG_OPTION_BACKUP_RESTORE / SeRestorePrivilege)";
+        rc = openProtectedValue(static_cast<HKEY>(root()), p.c_str(), &key.h);
+    }
+    const wchar_t empty[] = L"";
+    if (rc == ERROR_SUCCESS) {
+        stage = "RegSetValueExW (default / par défaut)";
+        rc = RegSetValueExW(key.h, L"", 0, REG_SZ, reinterpret_cast<const BYTE *>(empty), sizeof(empty));
+    }
+    return {rc == ERROR_SUCCESS, rc == ERROR_SUCCESS ? QString{} :
+        QStringLiteral("Étape / Step: %1\nCible / Target: %2\\InprocServer32\n%3")
+            .arg(stage, hiveName() + "\\" + target, errorText(rc)), static_cast<unsigned long>(rc)};
+}
 Result Registry::apply(bool classic) {
     if (machine() && !classic) return {false, "HKLM: use Undo to restore the saved system registration; deletion is refused."};
     const auto before = read();
@@ -285,58 +340,52 @@ Result Registry::apply(bool classic) {
     if (!validTree(before.tree) || QJsonDocument(before.tree).toJson(QJsonDocument::Compact).size() > 4 * 1024 * 1024)
         return {false, "Registry subtree exceeds backup safety limits"};
     const auto after = classic ? classicTree(before.tree) : QJsonObject{{"exists", false}};
-    if (before.tree == after) return {true, "unchanged"};
+    const bool paired = !secondaryPath_.isEmpty();
+    if (paired && (!validTree(before.secondary) ||
+        QJsonDocument(before.secondary).toJson(QJsonDocument::Compact).size() > 3 * 1024 * 1024 ||
+        QJsonDocument(before.tree).toJson(QJsonDocument::Compact).size() > 3 * 1024 * 1024))
+        return {false, "Registry subtrees exceed backup safety limits"};
+    const auto secondaryAfter = !paired ? QJsonObject{} :
+        (classic ? classicTree(before.secondary) : QJsonObject{{"exists", false}});
+    if (before.tree == after && before.secondary == secondaryAfter) return {true, "unchanged"};
     auto previous = backup();
     if (!previous.isEmpty() && previous.value("status").toString() == "prepared")
         return {false, "An interrupted operation requires Undo before another change."};
     QJsonObject record{{"schema", 2}, {"hive", hiveName()}, {"view", "64"}, {"path", path_}, {"before", before.tree}, {"after", after},
         {"protectedWrite", machine() && allowProtectedWrite_},
         {"status", "prepared"}, {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}};
+    if (paired) {
+        record["schema"] = 3;
+        record["secondaryPath"] = secondaryPath_;
+        record["secondaryBefore"] = before.secondary;
+        record["secondaryAfter"] = secondaryAfter;
+    }
     auto result = writeBackup(record);
     if (!result.ok) return result; // No registry write unless the snapshot is durable.
     const auto current = read();
-    if (!current.ok || current.tree != before.tree) {
+    if (!current.ok || (current.tree != before.tree || current.secondary != before.secondary)) {
         record["status"] = "undone";
         writeBackup(record);
         return {false, "Registry changed externally; refresh and try again."};
     }
-    // Enabling classic only writes the required default; unrelated values are preserved.
-    if (classic) {
-        Key key;
-        const auto p = (path_ + "\\InprocServer32").toStdWString();
-        QString stage = "RegOpenKeyExW (KEY_SET_VALUE)";
-        auto rc = RegOpenKeyExW(static_cast<HKEY>(root()), p.c_str(), 0,
-                               KEY_SET_VALUE | KEY_WOW64_64KEY, &key.h);
-        // Existing system registrations may allow updating a value but forbid
-        // creating children. Do not request KEY_WRITE/KEY_CREATE_SUB_KEY here.
-        if (rc == ERROR_FILE_NOT_FOUND || rc == ERROR_PATH_NOT_FOUND) {
-            stage = "RegCreateKeyExW (KEY_SET_VALUE)";
-            rc = RegCreateKeyExW(static_cast<HKEY>(root()), p.c_str(), 0, nullptr, 0,
-                                KEY_SET_VALUE | KEY_WOW64_64KEY, nullptr, &key.h, nullptr);
-        }
-        bool existed = false;
-        const auto children = before.tree.value("children").toObject();
-        for (auto it = children.begin(); it != children.end(); ++it)
-            if (it.key().compare("InprocServer32", Qt::CaseInsensitive) == 0) existed = true;
-        if (rc == ERROR_ACCESS_DENIED && machine() && allowProtectedWrite_ && existed) {
-            stage = "RegCreateKeyExW (REG_OPTION_BACKUP_RESTORE / SeRestorePrivilege)";
-            rc = openProtectedValue(static_cast<HKEY>(root()), p.c_str(), &key.h);
-        }
-        const wchar_t empty[] = L"";
-        if (rc == ERROR_SUCCESS) {
-            stage = "RegSetValueExW (default / par défaut)";
-            rc = RegSetValueExW(key.h, L"", 0, REG_SZ, reinterpret_cast<const BYTE *>(empty), sizeof(empty));
-        }
-        result = {rc == ERROR_SUCCESS, rc == ERROR_SUCCESS ? QString{} :
-            QStringLiteral("Étape / Step: %1\nCible / Target: %2\\InprocServer32\n%3")
-                .arg(stage, hiveName() + "\\" + path_, errorText(rc)), static_cast<unsigned long>(rc)};
-    } else result = restore(after);
+    if (before.tree != after)
+        result = classic ? setClassic(path_, before.tree) : restore(path_, after);
+    if (result.ok && paired && before.secondary != secondaryAfter)
+        result = classic ? setClassic(secondaryPath_, before.secondary) : restore(secondaryPath_, secondaryAfter);
     const auto actual = read();
-    if (!result.ok || !actual.ok || actual.tree != after) {
-        const auto rollback = actual.ok && actual.tree == before.tree ? Result{true, "unchanged"} : restore(before.tree);
-        if (rollback.ok) { record["status"] = "undone"; writeBackup(record); }
-        const auto previousState = rollback.ok ?
-            (actual.ok && actual.tree == before.tree ? QStringLiteral("inchangée / unchanged") : QStringLiteral("restaurée / restored")) : rollback.message;
+    if (!result.ok || !actual.ok || actual.tree != after || actual.secondary != secondaryAfter) {
+        const bool unchanged = actual.ok && actual.tree == before.tree && actual.secondary == before.secondary;
+        Result rollbackSecondary{true, {}};
+        Result rollbackPrimary{true, {}};
+        if (paired && (!actual.ok || actual.secondary != before.secondary))
+            rollbackSecondary = restore(secondaryPath_, before.secondary);
+        if (!actual.ok || actual.tree != before.tree)
+            rollbackPrimary = restore(path_, before.tree);
+        const bool rolledBack = rollbackPrimary.ok && rollbackSecondary.ok;
+        if (rolledBack) { record["status"] = "undone"; writeBackup(record); }
+        const auto previousState = rolledBack ?
+            (unchanged ? QStringLiteral("inchangée / unchanged") : QStringLiteral("restaurée / restored")) :
+            QStringLiteral("Restauration incomplète / Incomplete restoration: %1 %2").arg(rollbackPrimary.message, rollbackSecondary.message);
         return {false, QStringLiteral("Application impossible / Apply failed\n%1\n\nConfiguration précédente / Previous state: %2\nSauvegarde / Backup: %3")
             .arg(result.message, previousState, backupPath()), result.windowsError};
     }
@@ -352,15 +401,33 @@ Result Registry::undo() {
     if (!current.ok) return {false, current.error};
     const auto before = record.value("before").toObject(), after = record.value("after").toObject();
     if (machine() && record.value("protectedWrite").toBool()) allowProtectedWrite_ = true;
-    if (current.tree != before && current.tree != after)
+    const bool paired = record.value("schema").toInt() == 3;
+    const auto secondaryBefore = record.value("secondaryBefore").toObject();
+    const auto secondaryAfter = record.value("secondaryAfter").toObject();
+    const bool atBefore = current.tree == before && (!paired || current.secondary == secondaryBefore);
+    const bool atAfter = current.tree == after && (!paired || current.secondary == secondaryAfter);
+    const bool interrupted = record.value("status") == "prepared";
+    const bool recoverable = interrupted && (current.tree == before || current.tree == after) &&
+        (!paired || current.secondary == secondaryBefore || current.secondary == secondaryAfter);
+    if (!atBefore && !atAfter && !recoverable)
         return {false, "Registry changed externally. Automatic restore refused; backup preserved."};
-    if (current.tree != before) {
-        auto result = restore(before);
-        if (!result.ok) return result;
+    if (!atBefore) {
+        // Mark the operation recoverable before restoring either key.
+        record["status"] = "prepared";
+        const auto prepared = writeBackup(record);
+        if (!prepared.ok) return prepared;
+        if (paired && current.secondary != secondaryBefore) {
+            const auto result = restore(secondaryPath_, secondaryBefore);
+            if (!result.ok) return result;
+        }
+        if (current.tree != before) {
+            const auto result = restore(path_, before);
+            if (!result.ok) return result;
+        }
     }
     record["status"] = "undone";
     auto result = writeBackup(record);
-    return result.ok ? Result{true, current.tree == before ? "unchanged" : "changed"} : result;
+    return result.ok ? Result{true, atBefore ? "unchanged" : "changed"} : result;
 }
 QString systemDescription() {
     Key key;

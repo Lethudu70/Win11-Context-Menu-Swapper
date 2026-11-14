@@ -21,7 +21,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 private:
     Registry &registry_;
-    Registry machineRegistry_{productionPath(), {}, Hive::LocalMachine};
+    Registry machineRegistry_{productionPath(), {}, Hive::LocalMachine, false, secondaryProductionPath()};
     Registry &activeRegistry();
     QCheckBox *experimental_ = nullptr;
     QLabel *experimentalWarning_;

@@ -109,7 +109,7 @@ Window::Window(Registry &registry) : registry_(registry) {
         pending_ = false;
         settings.setValue("pending", false);
     }
-    setWindowTitle("Context Menu Swapper v4.0 — Leth Edition");
+    setWindowTitle("Context Menu Swapper v4.1 — Leth Edition");
     setWindowIcon(QIcon(":/app.ico"));
     setObjectName("window");
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowMinimizeButtonHint);
@@ -212,7 +212,7 @@ Window::Window(Registry &registry) : registry_(registry) {
 }
 void Window::texts() {
     const bool machine = activeRegistry().machine();
-    subtitle_->setText(t("v4.0 · Leth Edition · changement réversible", "v4.0 · Leth Edition · reversible changes"));
+    subtitle_->setText(t("v4.1 · Leth Edition · changement réversible", "v4.1 · Leth Edition · reversible changes"));
     minimize_->setToolTip(t("Réduire", "Minimize")); minimize_->setAccessibleName(minimize_->toolTip());
     close_->setToolTip(t("Fermer", "Close")); close_->setAccessibleName(close_->toolTip());
     system_->setToolTip(t("Système Windows détecté sur cet ordinateur", "Windows system detected on this computer"));
@@ -268,9 +268,9 @@ void Window::apply() {
     if (activeRegistry().machine()) { machineAction(selected_ == "classic" ? "classic" : "undo"); return; }
     const bool classic = selected_ == "classic";
     QString description = classic ? t("Configurer le menu classique pour votre compte ?", "Configure the classic menu for your account?") :
-        t("Rétablir Windows par défaut ? La clé CLSID ciblée et son contenu seront sauvegardés puis retirés.",
-          "Restore Windows defaults? The targeted CLSID key and its contents will be backed up and removed.");
-    description += "\n\nHKCU\\" + registry_.path() + "\n\n" +
+        t("Rétablir Windows par défaut ? Les deux clés CLSID ciblées seront sauvegardées puis retirées.",
+          "Restore Windows defaults? Both targeted CLSID keys will be backed up and removed.");
+    description += "\n\n" + registry_.targets() + "\n\n" +
         t("Explorer ne sera pas redémarré automatiquement.", "Explorer will not restart automatically.");
     if (!confirm(this, t("Appliquer", "Apply"), description, french_)) return;
     setBusy(true);
@@ -426,9 +426,9 @@ void Window::exportDiagnostic() {
     if (path.isEmpty()) return;
     auto &registry = activeRegistry();
     const auto s = registry.read();
-    const QString data = "Context Menu Swapper 4.0.0\n" + systemDescription() +
+    const QString data = "Context Menu Swapper 4.1.0\n" + systemDescription() +
         "\nUTC: " + QDateTime::currentDateTimeUtc().toString(Qt::ISODate) +
-        "\nScope: " + registry.hiveName() + "\\" + registry.path() + "\nMode: " + s.mode() +
+        "\nTargets:\n" + registry.targets() + "\nMode: " + s.mode() +
         "\nPending restart: " + (pending_ ? "yes" : "no") + "\nRead error: " + s.error +
         "\nExperimental: " + (registry.machine() ? "yes" : "no") +
         "\nBackup available: " + (registry.canUndo() ? "yes" : "no") +
@@ -489,7 +489,8 @@ void Window::capture(const QString &path) {
         ok = grab().save(info.dir().filePath(info.completeBaseName() + "-hklm.png")) && ok;
         experimental_->setChecked(false); qApp->processEvents();
         check("switching scope causes no registry writes or elevation", isProcessElevated() == elevatedBefore &&
-            registry_.read().tree == userBefore.tree && machineRegistry_.read().tree == machineBefore.tree &&
+            registry_.read().tree == userBefore.tree && registry_.read().secondary == userBefore.secondary &&
+            machineRegistry_.read().tree == machineBefore.tree && machineRegistry_.read().secondary == machineBefore.secondary &&
             activeRegistry().hiveName() == "HKCU");
         close_->click(); qApp->processEvents();
         check("custom close button", !isVisible());

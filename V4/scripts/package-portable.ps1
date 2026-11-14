@@ -7,7 +7,7 @@ $sourceRoot = Split-Path -Parent $PSScriptRoot
 $binRoot = Join-Path $UcrtRoot 'bin'
 $env:PATH = "$binRoot;$env:PATH"
 # Fresh versioned folder avoids stale DLLs without deleting existing distributions.
-$distRoot = Join-Path $sourceRoot ('dist\ContextMenuSwapper-4.0.0-win64-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+$distRoot = Join-Path $sourceRoot ('dist\ContextMenuSwapper-4.1.0-win64-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
 New-Item -ItemType Directory -Path $distRoot -Force | Out-Null
 $exe = Join-Path $distRoot 'ContextMenuSwapper.exe'
 Copy-Item -LiteralPath (Join-Path $BuildRoot 'ContextMenuSwapper.exe') -Destination $exe

@@ -17,8 +17,9 @@ $smokeRoot = Join-Path $reportRoot "i-$token"
 $appDir = Join-Path $smokeRoot 'app files'
 $groupName = 'LethTools\Context Menu Swapper'
 $groupDir = Join-Path ([Environment]::GetFolderPath('Programs')) $groupName
+$shortcutPath = Join-Path $groupDir 'Context Menu Swapper v4.1.lnk'
 if (Test-Path -LiteralPath $appDir) { throw 'Test destination already exists' }
-if (Test-Path -LiteralPath $groupDir) { throw 'Test shortcut group already exists' }
+if (Test-Path -LiteralPath $shortcutPath) { throw 'Test shortcut already exists' }
 New-Item -ItemType Directory -Path $smokeRoot -Force | Out-Null
 $checks = [System.Collections.Generic.List[object]]::new()
 function Check([string]$Name, [bool]$Passed) {
@@ -50,10 +51,9 @@ try {
     Check 'all installed payload hashes match the published portable' ($files.Count -gt 20)
     $entry = $userHive.OpenSubKey($uninstallKey)
     Check 'registered in current-user Apps list' ($null -ne $entry)
-    Check 'registered version is 4.0.0' ($entry.GetValue('DisplayVersion') -eq '4.0.0')
+    Check 'registered version is 4.1.0' ($entry.GetValue('DisplayVersion') -eq '4.1.0')
     Check 'Apps list uses the application icon' ($entry.GetValue('DisplayIcon') -like '*ContextMenuSwapper.exe*')
     $entry.Dispose()
-    $shortcutPath = Join-Path $groupDir 'Context Menu Swapper v4.0.lnk'
     Check 'Start menu shortcut exists' (Test-Path -LiteralPath $shortcutPath)
     $shell = New-Object -ComObject WScript.Shell
     $shortcut = $shell.CreateShortcut($shortcutPath)
@@ -79,7 +79,7 @@ finally {
     if ($entryAfter) { $entryAfter.Dispose() }
     $userHive.Dispose()
     $checks.Add([pscustomobject]@{name='installed application removed';passed=(-not (Test-Path -LiteralPath (Join-Path $appDir 'ContextMenuSwapper.exe')))})
-    $checks.Add([pscustomobject]@{name='test Start menu shortcut removed';passed=(-not (Test-Path -LiteralPath (Join-Path $groupDir 'Context Menu Swapper v4.0.lnk')))})
+    $checks.Add([pscustomobject]@{name='test Start menu shortcut removed';passed=(-not (Test-Path -LiteralPath $shortcutPath))})
     $report = [pscustomobject]@{passed=(-not $failure -and @($checks | Where-Object {-not $_.passed}).Count -eq 0);error=$failure;checks=$checks;logDirectory=$smokeRoot}
     $report | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $reportRoot 'installer-verification.json') -Encoding UTF8
     $report | ConvertTo-Json -Depth 5 | Write-Output

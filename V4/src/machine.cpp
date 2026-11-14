@@ -67,12 +67,13 @@ int runMachineAction(const QString &action, bool french) {
     }
     struct Release { HANDLE h; ~Release() { ReleaseMutex(h); CloseHandle(h); } } release{mutex};
     const bool undo = action == "undo";
+    Registry registry(productionPath(), {}, Hive::LocalMachine, false, secondaryProductionPath());
     QMessageBox box(QMessageBox::Warning, t("HKLM — EXPÉRIMENTAL", "HKLM — EXPERIMENTAL"),
         t("EXPERIMENTAL — NON RECOMMANDÉ POUR LES UTILISATEURS STANDARD.\n\nCette opération peut affecter tous les comptes du PC. Son effet n'est pas garanti et un réglage HKCU peut rester prioritaire. Une clé protégée peut nécessiter une confirmation avancée ; propriétaire et permissions sont conservés.\n\n",
           "EXPERIMENTAL — NOT RECOMMENDED FOR STANDARD USERS.\n\nThis operation can affect all accounts on this PC. Its effect is not guaranteed and an HKCU override may take precedence. A protected key may require advanced confirmation; ownership and permissions are preserved.\n\n") +
         (undo ? t("Action : restaurer l'état HKLM sauvegardé.", "Action: restore the saved HKLM state.") :
                 t("Action : sauvegarder HKLM, puis définir l'override classique.", "Action: back up HKLM, then set the classic override.")) +
-        "\n\nHKLM\\" + productionPath(), QMessageBox::Yes | QMessageBox::Cancel);
+        "\n\n" + registry.targets(), QMessageBox::Yes | QMessageBox::Cancel);
     box.setWindowIcon(QIcon(":/app.ico"));
     box.setStyleSheet(checkboxStyle());
     auto *ack = new QCheckBox(t("Je comprends la portée système et le caractère expérimental.",
@@ -84,7 +85,6 @@ int runMachineAction(const QString &action, bool french) {
     box.setDefaultButton(QMessageBox::Cancel);
     QObject::connect(ack, &QCheckBox::toggled, yes, &QAbstractButton::setEnabled);
     if (box.exec() != QMessageBox::Yes || !ack->isChecked()) return 20;
-    Registry registry(productionPath(), {}, Hive::LocalMachine);
     auto result = undo ? registry.undo() : registry.apply(true);
     if (!undo && !result.ok && result.windowsError == ERROR_ACCESS_DENIED && registry.backup().value("status") == "undone") {
         QMessageBox retry(QMessageBox::Warning, t("HKLM — clé protégée", "HKLM — protected key"),
@@ -99,7 +99,7 @@ int runMachineAction(const QString &action, bool french) {
         retry.button(QMessageBox::Cancel)->setText(t("Annuler", "Cancel")); retry.setDefaultButton(QMessageBox::Cancel);
         QObject::connect(consent, &QCheckBox::toggled, retry.button(QMessageBox::Yes), &QAbstractButton::setEnabled);
         if (retry.exec() != QMessageBox::Yes || !consent->isChecked()) return 20;
-        Registry protectedRegistry(productionPath(), {}, Hive::LocalMachine, true);
+        Registry protectedRegistry(productionPath(), {}, Hive::LocalMachine, true, secondaryProductionPath());
         result = protectedRegistry.apply(true);
     }
     if (!result.ok) {
